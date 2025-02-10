@@ -11,7 +11,7 @@ export const AllPosts = () => {
   const posts: Post[] = fetcher.data?.posts || [];
   return (
     <article>
-      <section className="grid gap-3 grid-cols-2">
+      <section className="grid gap-3 lg:grid-cols-4 md:grid-cols-3 grid-cols-2">
         {posts.map((post) => (
           <PostCard key={post.id} post={post} />
         ))}

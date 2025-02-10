@@ -13,6 +13,10 @@ export const meta = frontmatter.meta;
 export const headers = frontmatter.headers;
 import * as v from "valibot"; // 1.24 kB
 
+<section className="flex flex-col lg:flex-row items-center justify-center py-20 gap-6 max-w-5xl mx-auto">
+
+<div className="min-w-[50%]">
+
 ## ¡Hola! 👋🏼 me hago llamar:
 
 # Héctorbliss
@@ -37,17 +41,31 @@ Pero, a veces, mis alumnos me dicen blissito
 
 🌀 Bienvenid@ a mi sitio 👾
 
+</div>
+
+<img
+  src="/me_in_venice.jpeg"
+  alt="cover"
+  className="rounded-2xl mb-8 max-w-[640px]"
+/>
+
+</section>
+<section className="py-20 max-w-3xl mx-auto">
+
 <Subscriber />
 
 <div className="rounded-2xl overflow-hidden my-6">
 
 ```js
-const un_poquito = "de código pa ver cómo se mira.";
-const funcion = () => {};
+const soy_author_de_alguna_bliblioteca = {vitia: "www.easybits.cloud"};
+const lee_alguno_de_mis_posts = () => {};
+const o_checa_mis_cursos = () => {"también":"en www.fixtergeek.com"};
 ```
 
 </div>
 
 <section>
   <AllPosts />
+</section>
+
 </section>
