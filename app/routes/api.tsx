@@ -25,6 +25,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   const intent = url.searchParams.get("intent");
   if (intent === "home_page") {
     const posts = await db.post.findMany({
+      orderBy: { createdAt: "desc" },
       where: { published: true },
       select: {
         title: true,
