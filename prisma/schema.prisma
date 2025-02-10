@@ -22,13 +22,15 @@ model Post {
   isFeatured Boolean? @default(false)
 
   // optionals
-  description  String?
-  coverImage   String?
-  body         String?
-  metaImage    String?
-  youtubeLink  String?
-  authorAtLink String?
-  authorObject Json?
+  image       String?
+  description String?
+  coverImage  String?
+  body        String?
+  metaImage   String?
+  youtubeLink String?
+  authorName  String?
+  authorImage String?
+  authorLink  String?
 
   // mapping (old db)
   @@map("posts")
