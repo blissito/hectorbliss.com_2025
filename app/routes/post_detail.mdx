@@ -1,0 +1,30 @@
+---
+meta:
+  - title: Este es un post de blog
+  - name: description
+    content: Preparate para disfrutar de la lectura
+headers:
+  Cache-Control: max-age=2419200
+---
+
+import { db } from "../.server/db";
+import { useLoaderData } from "react-router";
+import { PostBody } from "../components/PostBody";
+import { Subscriber } from "../components/Subscriber";
+export async function loader({ params }) {
+  const post = await db.post.findUnique({
+    where: {
+      slug: params.slug,
+    },
+  });
+  if (!post) throw new Response("Post not found", { status: 404 });
+  return { post };
+}
+export function Title() {
+  const { post } = useLoaderData();
+  return <h1>{post.title}</h1>;
+}
+
+<PostBody />
+
+<Subscriber />

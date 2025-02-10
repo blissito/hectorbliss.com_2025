@@ -1,31 +1,47 @@
 import { useFetcher } from "react-router";
-import { AdminButton } from "~/routes/admin";
 import { IoIosCloseCircleOutline } from "react-icons/io";
-import { useEffect } from "react";
+import { useEffect, useRef, type FormEvent } from "react";
+import type { Post } from "@prisma/client";
+import { AdminButton } from "./admin_components";
 
 export const PostFormModal = ({
   isOpen,
   onClose,
+  post,
 }: {
+  post?: Post | null;
   isOpen: boolean;
   onClose?: () => void;
 }) => {
   const fetcher = useFetcher();
+  const formRef = useRef<HTMLFormElement>(null);
+
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        onClose?.();
+        handleClose();
       }
     };
-    if (isOpen) {
-      addEventListener("keydown", handleEsc);
-    } else {
-      removeEventListener("keydown", handleEsc);
-    }
+    addEventListener("keydown", handleEsc);
     return () => {
       removeEventListener("keydown", handleEsc);
     };
   }, []);
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const body = new FormData(formRef.current || undefined);
+    body.set("intent", post?.id ? "update_post" : "add_post");
+    post?.id && body.set("id", post.id);
+    fetcher.submit(body, { method: "post", action: "/api/posts" });
+    handleClose();
+  };
+
+  const handleClose = () => {
+    onClose?.();
+  };
+
+  const isLoading = fetcher.state !== "idle";
 
   if (!isOpen) return null;
 
@@ -34,20 +50,28 @@ export const PostFormModal = ({
       <section className="absolute inset-0 backdrop-blur" />
       <section className="relative bg-slate-100 text-slate-900 min-h-[420px] w-[620px]">
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute right-4 top-4 z-50 text-5xl"
         >
           <IoIosCloseCircleOutline />
         </button>
-        <h1>Nuevo post</h1>
-        <fetcher.Form method="post" className="grid gap-3 px-12 bg-transparent">
-          <Input name="title" />
-          <Input type="textarea" name="body" />
-          <Input name="image" />
-          <Input name="description" />
+        {post?.id ? <h1>Edita el post</h1> : <h1>Nuevo post</h1>}
+        <fetcher.Form
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className="grid gap-3 px-12 bg-transparent pb-6"
+        >
+          <Input name="title" defaultValue={post?.title} />
+          <Input type="textarea" name="body" defaultValue={post?.body} />
+          <Input required={false} name="image" defaultValue={post?.image} />
+          <Input
+            required={false}
+            name="description"
+            defaultValue={post?.description}
+          />
           <p className="text-xs text-slate-500">Se publicará automáticamente</p>
-          <AdminButton type="submit" name="intent" value="add_post">
-            Crear
+          <AdminButton disabled={isLoading} type="submit">
+            {post?.id ? "Guardar" : "Crear"}
           </AdminButton>
         </fetcher.Form>
       </section>
@@ -61,7 +85,7 @@ const Input = ({
   required = true,
   ...props
 }: {
-  required?: true;
+  required?: boolean;
   label?: string;
   [x: string]: unknown;
 }) => {

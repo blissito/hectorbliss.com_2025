@@ -18,7 +18,7 @@ model Post {
   title String @unique
 
   // defaults
-  published  Boolean  @default(false)
+  published  Boolean  @default(true)
   isFeatured Boolean? @default(false)
 
   // optionals

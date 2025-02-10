@@ -1,58 +1,46 @@
 import { useState } from "react";
 import { PostFormModal } from "~/components/PostFormModal";
 import type { Route } from "./+types/admin";
-import slugify from "slugify";
 import { db } from "~/.server/db";
+import type { Post } from "@prisma/client";
+import { AdminButton, PostList } from "~/components/admin_components";
 
-export const action = async ({ request }: Route.ActionArgs) => {
-  const formData = await request.formData();
-  const intent = formData.get("intent");
-
-  if (intent === "add_post") {
-    const form = Object.fromEntries(formData);
-    const data = {
-      title: form.title as string,
-      slug: slugify(form.title as string),
-      image: form.image as string,
-      description: form.description as string,
-      body: form.body as string,
-      youtubeLink: form.youtubeLink as string,
-      authorName: "Héctorbliss",
-      authorImage: "/me_logo.png",
-      authorLink: "https://www.hectorbliss.com",
-    };
-    // @todo validation?
-    await db.post.create({ data });
-  }
-
-  const data = Object.fromEntries(formData);
-  console.log("DATA:", data);
-  return null;
+export const loader = async () => {
+  const posts = await db.post.findMany({
+    take: 5,
+    orderBy: { createdAt: "desc" },
+  });
+  return { posts };
 };
 
-export default function AdminPage() {
-  const [isPostFormOpen, setIsPostFormOpen] = useState(true);
+export default function AdminPage({ loaderData }: Route.ComponentProps) {
+  const { posts } = loaderData;
+  const [isPostFormOpen, setIsPostFormOpen] = useState(false);
+  const [post, setPost] = useState<Post | null>(null);
+  const handlePostClick = (p: Post) => {
+    setPost(p);
+    setIsPostFormOpen(true);
+  };
+  const handleClose = () => {
+    setIsPostFormOpen(false);
+    setPost(null);
+  };
   return (
     <>
       <PostFormModal
-        onClose={() => setIsPostFormOpen(false)}
+        post={post}
+        onClose={handleClose}
         isOpen={isPostFormOpen}
       />
-      <article className="py-20">
-        <h1 className="text-3xl">Administra tus posts y tus cursos</h1>
-        <AdminButton onClick={() => setIsPostFormOpen(true)}>
-          Añadir nuevo post
-        </AdminButton>
+      <article className="max-w-3xl mx-auto">
+        <nav className="py-20">
+          <h1 className="text-5xl">Administra el blog</h1>
+          <AdminButton onClick={() => setIsPostFormOpen(true)}>
+            Añadir post
+          </AdminButton>
+        </nav>
+        <PostList onClick={handlePostClick} posts={posts} />
       </article>
     </>
   );
 }
-
-export const AdminButton = ({ ...props }) => {
-  return (
-    <button
-      className="bg-slate-500 py-3 px-6 hover:bg-slate-400 ml-auto block m-8"
-      {...props}
-    />
-  );
-};
