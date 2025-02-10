@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  // Basic fields
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+
+  // Unique fields
+  slug  String @unique
+  title String @unique
+
+  // defaults
+  published  Boolean  @default(false)
+  isFeatured Boolean? @default(false)
+
+  // optionals
+  description  String?
+  coverImage   String?
+  body         String?
+  metaImage    String?
+  youtubeLink  String?
+  authorAtLink String?
+  authorObject Json?
+
+  // mapping (old db)
+  @@map("posts")
+}
